@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Autobarn.Data;
 using Autobarn.Data.Entities;
 using Autobarn.Website.Models;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
@@ -61,7 +63,9 @@ namespace Autobarn.Website.Controllers.Api {
         public IActionResult Put(string id, [FromBody] VehicleDto dto) {
             var model = db.FindModel(dto.ModelCode);
             if (model == null) return BadRequest("we couldn't find that model");
-            if (dto.Registration != id) return BadRequest("Registration plate must match URL");
+            if (!dto.Registration.IsNullOrEmpty() 
+                && 
+                ! dto.Registration.Equals(id, StringComparison.InvariantCultureIgnoreCase)) return BadRequest("Registration plate must match URL");
             var vehicle = new Vehicle() {
                 VehicleModel = model,
                 Color = dto.Color,

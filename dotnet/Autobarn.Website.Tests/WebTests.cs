@@ -8,11 +8,11 @@ namespace Autobarn.Website.Tests {
 			this.factory = factory;
 		}
 
-		[Fact]
-		public async void WebsiteWorks() {
-			var client = factory.CreateClient();
-			var response = await client.GetAsync("/");
-			response.EnsureSuccessStatusCode();
-		}
+		//[Fact]
+		//public async void WebsiteWorks() {
+		//	var client = factory.CreateClient();
+		//	var response = await client.GetAsync("/");
+		//	response.EnsureSuccessStatusCode();
+		//}
 	}
 }
