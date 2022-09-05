@@ -7,6 +7,7 @@ int n = 0;
 Console.WriteLine("Press a key to publish a message");
 while(true) {
     var g = new Greeting {
+        Name = "Everyone",
         Number = n++
     };
     bus.PubSub.Publish(g);

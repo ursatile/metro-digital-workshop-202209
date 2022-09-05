@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using System.Reflection;
+using EasyNetQ;
 using Microsoft.OpenApi.Models;
 
 namespace Autobarn.Website {
@@ -25,6 +26,11 @@ namespace Autobarn.Website {
             services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddSingleton<IAutobarnDatabase, AutobarnCsvFileDatabase>();
+
+            var amqp = Configuration.GetConnectionString("AutobarnRabbitMqConnectionString");
+            var bus = RabbitHutch.CreateBus(amqp);
+            services.AddSingleton(bus);
+
             services.AddSwaggerGen(
                 config => {
                     config.SwaggerDoc("v1", new OpenApiInfo() {

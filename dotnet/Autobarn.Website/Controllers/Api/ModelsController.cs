@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autobarn.Data;
 using Autobarn.Data.Entities;
+using Autobarn.Messages;
 using Autobarn.Website.Models;
+using EasyNetQ;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.Server;
 
@@ -12,9 +16,11 @@ namespace Autobarn.Website.Controllers.Api {
     [ApiController]
     public class ModelsController : ControllerBase {
         private readonly IAutobarnDatabase db;
+        private readonly IBus bus;
 
-        public ModelsController(IAutobarnDatabase db) {
+        public ModelsController(IAutobarnDatabase db, IBus bus) {
             this.db = db;
+            this.bus = bus;
         }
         // GET: api/<ModelsController>
         //[HttpGet]
@@ -30,7 +36,7 @@ namespace Autobarn.Website.Controllers.Api {
 
         // POST api/<ModelsController>
         [HttpPost("{id}")]
-        public IActionResult Post(string id, [FromBody] VehicleDto dto) {
+        public async Task<IActionResult> Post(string id, [FromBody] VehicleDto dto) {
             var existing = db.FindVehicle(dto.Registration);
             if (existing != null)
                 return Conflict(
@@ -42,8 +48,22 @@ namespace Autobarn.Website.Controllers.Api {
                 Year = dto.Year,
                 Registration = dto.Registration
             };
+            await PublishNewVehicleNotification(vehicle);
             db.CreateVehicle(vehicle);
+
             return Created($"/api/vehicles/{vehicle.Registration}", vehicle);
+        }
+
+        private async Task PublishNewVehicleNotification(Vehicle vehicle) {
+            var newVehicleMessage = new NewVehicleMessage {
+                Color = vehicle.Color,
+                ListedAt = DateTimeOffset.UtcNow,
+                ManufacturerName = vehicle.VehicleModel.Manufacturer.Name,
+                ModelName = vehicle.VehicleModel.Name,
+                Registration = vehicle.Registration,
+                Year = vehicle.Year
+            };
+            await bus.PubSub.PublishAsync(newVehicleMessage);
         }
     }
 }

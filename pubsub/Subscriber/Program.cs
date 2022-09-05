@@ -5,7 +5,8 @@ const string AMQP = "amqps://dllepypl:rRHZ7tOnM-dRXtm-cRMRJHRNsSNr7_jq@hefty-blo
 using var bus = RabbitHutch.CreateBus(AMQP);
 
 Console.WriteLine("Listening for messages. Press enter to exit");
-bus.PubSub.Subscribe<Greeting>("SUBSCRIPTION_ID", greeting => {
+bus.PubSub.Subscribe<Greeting>("dylanbeattie", greeting => {
+    Thread.Sleep(TimeSpan.FromSeconds(1));
     Console.WriteLine(greeting);
 });
 
