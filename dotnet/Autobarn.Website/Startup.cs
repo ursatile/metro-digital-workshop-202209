@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 namespace Autobarn.Website {
     public class Startup {
@@ -22,7 +25,25 @@ namespace Autobarn.Website {
             services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddSingleton<IAutobarnDatabase, AutobarnCsvFileDatabase>();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(
+                config => {
+                    config.SwaggerDoc("v1", new OpenApiInfo() {
+                        Title = "Autobarn API",
+                        Description = "The world's best API for selling second hand cars!",
+                        Contact = new OpenApiContact {
+                            Name = "Dylan Beattie",
+                            Email = "dylan@ursatile.com",
+                            Url = new Uri("https://twitter.com/dylanbeattie"),
+                        },
+                        License = new OpenApiLicense {
+                            Name = "Use under LICX",
+                            Url = new Uri("https://example.com/license"),
+                        }
+                    });
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    config.IncludeXmlComments(xmlPath);
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
