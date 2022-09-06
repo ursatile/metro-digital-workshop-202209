@@ -13,4 +13,13 @@ namespace Autobarn.Messages {
             return $"{Registration},{Color},{Year},{ManufacturerName},{ModelName},{ListedAt:O}";
         }
     }
+
+    public class NewVehiclePriceMessage : NewVehicleMessage {
+        public int Price { get; set; }
+        public string Currency { get; set; }
+
+        public override string ToString() {
+            return $"{base.ToString()} - COST {Price}{Currency}";
+        }
+    }
 }

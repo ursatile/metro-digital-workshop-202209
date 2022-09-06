@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.Website", "Autobarn.Website\Autobarn.Website.csproj", "{BA806410-F779-461A-B4F1-D97D7289FB5B}"
 EndProject
@@ -9,13 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.Data", "Autobarn.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.Website.Tests", "Autobarn.Website.Tests\Autobarn.Website.Tests.csproj", "{39C4F7B7-43D1-493F-97EE-E7C57D6C7F07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autobarn.AuditLog", "Autobarn.AuditLog\Autobarn.AuditLog.csproj", "{E128665A-CDB3-4CFF-8F22-62D1392BD547}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.AuditLog", "Autobarn.AuditLog\Autobarn.AuditLog.csproj", "{E128665A-CDB3-4CFF-8F22-62D1392BD547}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autobarn.Messages", "Autobarn.Messages\Autobarn.Messages.csproj", "{A8D27D4F-51B2-47B2-AB2E-2CC58A81CCD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.Messages", "Autobarn.Messages\Autobarn.Messages.csproj", "{A8D27D4F-51B2-47B2-AB2E-2CC58A81CCD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autobarn.PricingClient", "Autobarn.PricingClient\Autobarn.PricingClient.csproj", "{9A9A8AAD-B26C-4F0C-A4AA-09C066F9BED9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.PricingClient", "Autobarn.PricingClient\Autobarn.PricingClient.csproj", "{9A9A8AAD-B26C-4F0C-A4AA-09C066F9BED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autobarn.PricingServer", "Autobarn.PricingServer\Autobarn.PricingServer.csproj", "{1DBDF544-03ED-48CE-BCF4-4793EC5925EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autobarn.PricingServer", "Autobarn.PricingServer\Autobarn.PricingServer.csproj", "{1DBDF544-03ED-48CE-BCF4-4793EC5925EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autobarn.Notifier", "Autobarn.Notifier\Autobarn.Notifier.csproj", "{F95DC062-49CF-4D3D-8258-752195AAE931}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,18 @@ Global
 		{1DBDF544-03ED-48CE-BCF4-4793EC5925EE}.Release|x64.Build.0 = Release|Any CPU
 		{1DBDF544-03ED-48CE-BCF4-4793EC5925EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{1DBDF544-03ED-48CE-BCF4-4793EC5925EE}.Release|x86.Build.0 = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|x64.Build.0 = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Debug|x86.Build.0 = Debug|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|x64.ActiveCfg = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|x64.Build.0 = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|x86.ActiveCfg = Release|Any CPU
+		{F95DC062-49CF-4D3D-8258-752195AAE931}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
