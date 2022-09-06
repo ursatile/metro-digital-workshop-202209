@@ -32,17 +32,21 @@ namespace Autobarn.Notifier {
         private readonly ILogger<Notifier> logger;
         private readonly IBus bus;
         private readonly HubConnection hub;
+        private readonly IConfiguration configuration;
 
         public Notifier(
             ILogger<Notifier> logger,
             IBus bus,
-            HubConnection hub) {
+            HubConnection hub,
+            IConfiguration configuration) {
             this.logger = logger;
             this.bus = bus;
             this.hub = hub;
+            this.configuration = configuration;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken) {
+            logger.LogInformation($"Connecting to SignalR using {configuration["AutobarnSignalRHubUrl"]}")
             await hub.StartAsync();
             await bus.PubSub.SubscribeAsync<NewVehiclePriceMessage>("autobarn.notifier", HandleNewVehiclePriceMessage);
         }
