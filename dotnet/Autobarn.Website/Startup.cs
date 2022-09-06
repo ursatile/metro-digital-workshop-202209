@@ -7,7 +7,12 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using System.Reflection;
+using Autobarn.Website.GraphQL.GraphTypes;
+using Autobarn.Website.GraphQL.Schemas;
 using EasyNetQ;
+using GraphiQl;
+using GraphQL;
+using GraphQL.Types;
 using Microsoft.OpenApi.Models;
 
 namespace Autobarn.Website {
@@ -50,6 +55,11 @@ namespace Autobarn.Website {
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     config.IncludeXmlComments(xmlPath);
                 });
+            services.AddGraphQL(builder => builder
+               .AddNewtonsoftJson()
+               .AddSchema<AutobarnSchema>()
+               .AddGraphTypes(typeof(VehicleGraphType).Assembly)
+           );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
@@ -68,6 +78,9 @@ namespace Autobarn.Website {
 
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            app.UseGraphQL<ISchema>();
+            app.UseGraphiQl("/graphiql");
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllerRoute(
