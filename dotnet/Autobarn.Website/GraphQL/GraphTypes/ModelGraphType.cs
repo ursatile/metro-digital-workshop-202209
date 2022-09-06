@@ -10,4 +10,4 @@ namespace Autobarn.Website.GraphQL.GraphTypes {
                 .Description("The company who manufactures this model of car");
         }
     }
-}
+}   

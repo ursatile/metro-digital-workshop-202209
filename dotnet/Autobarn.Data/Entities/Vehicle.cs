@@ -11,5 +11,5 @@ namespace Autobarn.Data.Entities {
 
 		[JsonIgnore]
 		public virtual Model VehicleModel { get; set; }
-	}
+    }
 }
