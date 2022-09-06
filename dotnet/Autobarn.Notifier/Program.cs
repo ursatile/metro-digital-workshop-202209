@@ -3,10 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autobarn.Messages;
 using EasyNetQ;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Autobarn.Notifier {
     internal class Program {
@@ -16,7 +18,9 @@ namespace Autobarn.Notifier {
                     var amqp = hostContext.Configuration.GetConnectionString("AutobarnRabbitMqConnectionString");
                     var bus = RabbitHutch.CreateBus(amqp);
                     services.AddSingleton(bus);
-
+                    var hubUrl = hostContext.Configuration["AutobarnSignalRHubUrl"];
+                    var hub = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+                    services.AddSingleton(hub);
                     services.AddHostedService<Notifier>();
                 })
                 .Build();
@@ -27,27 +31,31 @@ namespace Autobarn.Notifier {
     internal class Notifier : IHostedService {
         private readonly ILogger<Notifier> logger;
         private readonly IBus bus;
+        private readonly HubConnection hub;
 
         public Notifier(
             ILogger<Notifier> logger,
-            IBus bus
-        ) {
+            IBus bus,
+            HubConnection hub) {
             this.logger = logger;
             this.bus = bus;
+            this.hub = hub;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken) {
+            await hub.StartAsync();
             await bus.PubSub.SubscribeAsync<NewVehiclePriceMessage>("autobarn.notifier", HandleNewVehiclePriceMessage);
-
         }
 
-        private void HandleNewVehiclePriceMessage(NewVehiclePriceMessage m) {
+        private async Task HandleNewVehiclePriceMessage(NewVehiclePriceMessage m) {
             logger.LogInformation(m.ToString());
+            const string user = "autobarn.notifier";
+            var message = JsonConvert.SerializeObject(m);
+            await hub.SendAsync("ThisMethodNameCanBeAnythingWeLike", user, message);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) {
-            return Task.CompletedTask;
-
+        public async Task StopAsync(CancellationToken cancellationToken) {
+            await hub.StopAsync();
         }
     }
 }
