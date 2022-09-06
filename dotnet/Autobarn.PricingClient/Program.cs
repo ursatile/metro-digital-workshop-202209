@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Autobarn.Messages;
+using Autobarn.PricingEngine;
+using EasyNetQ;
+using Grpc.Net.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +15,13 @@ namespace Autobarn.PricingClient {
         static async Task Main(string[] args) {
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((hostContext, services) => {
+                    var amqp = hostContext.Configuration.GetConnectionString("AutobarnRabbitMqConnectionString");
+                    var bus = RabbitHutch.CreateBus(amqp);
+                    services.AddSingleton(bus);
+
+                    var grpcUrl = hostContext.Configuration["AutobarnPricingServerUrl"];
+                    services.AddGrpcClient<Pricer.PricerClient>(options => options.Address = new Uri(grpcUrl));
+
                     services.AddHostedService<PricingClientWorker>();
                 })
                 .Build();
@@ -19,19 +31,38 @@ namespace Autobarn.PricingClient {
 
     internal class PricingClientWorker : IHostedService {
         private readonly ILogger<PricingClientWorker> logger;
+        private readonly IBus bus;
+        private readonly Pricer.PricerClient grpc;
 
-        public PricingClientWorker(ILogger<PricingClientWorker> logger) {
+        public PricingClientWorker(
+            ILogger<PricingClientWorker> logger,
+            IBus bus,
+            Pricer.PricerClient grpc
+        ) {
             this.logger = logger;
+            this.bus = bus;
+            this.grpc = grpc;
         }
-        public Task StartAsync(CancellationToken cancellationToken) {
+        public async Task StartAsync(CancellationToken cancellationToken) {
             logger.LogCritical("THIS IS A CRITICAL PROBLEM");
             logger.LogError("This went wrong but somebody probably tried again and it worked!");
             logger.LogWarning("Something went wrong but nobody noticed");
             logger.LogInformation("Started the pricing client!");
             logger.LogDebug("This is really detailed debugging information");
             logger.LogTrace("This is even more detailed debugging information");
-            return Task.CompletedTask;
+            await bus.PubSub.SubscribeAsync<NewVehicleMessage>("autobarn.pricingclient", HandleNewVehicleMessage);
+        }
 
+        public async Task HandleNewVehicleMessage(NewVehicleMessage m) {
+            logger.LogInformation(m.ToString());
+            var priceRequest = new PriceRequest {
+                Color = m.Color,
+                ManufacturerName = m.ManufacturerName,
+                ModelName = m.ModelName,
+                Year = m.Year
+            };
+            var priceReply = await grpc.GetPriceAsync(priceRequest);
+            logger.LogInformation($"Got a price: {priceReply.Price} {priceReply.CurrencyCode}");
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
