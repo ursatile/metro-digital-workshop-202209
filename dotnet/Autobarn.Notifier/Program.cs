@@ -42,8 +42,24 @@ namespace Autobarn.Notifier {
             this.hub = hub;
         }
 
+        private const int MAX_CONNECTION_ATTEMPTS = 10;
+        private const int DELAY_IN_MILLISECONDS = 5000;
         public async Task StartAsync(CancellationToken cancellationToken) {
-            await hub.StartAsync();
+            var attempt = 0;
+            while (true) {
+                try {
+                    logger.LogInformation(
+                        $"Connecting to SignalR Hub (attempt #{attempt}");
+                    await hub.StartAsync();
+                    break;
+                } catch (Exception) {
+                    if (attempt++ >= MAX_CONNECTION_ATTEMPTS) throw;
+                    logger.LogWarning(
+                        $"Couldn't connect to SignalR Hub - trying again in {DELAY_IN_MILLISECONDS}ms...");
+                    Thread.Sleep(DELAY_IN_MILLISECONDS);
+                }
+            }
+
             await bus.PubSub.SubscribeAsync<NewVehiclePriceMessage>("autobarn.notifier", HandleNewVehiclePriceMessage);
         }
 

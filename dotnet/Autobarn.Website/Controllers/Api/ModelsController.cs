@@ -41,7 +41,10 @@ namespace Autobarn.Website.Controllers.Api {
             if (existing != null)
                 return Conflict(
                     $"Sorry, you can't sell the same car twice! (and {dto.Registration} is already in our database.)");
+
             var model = db.FindModel(id);
+            if (model == default) return BadRequest($"Sorry - we don't know what kind of car a {id} is!");
+
             var vehicle = new Vehicle() {
                 VehicleModel = model,
                 Color = dto.Color,

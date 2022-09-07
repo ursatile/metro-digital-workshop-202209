@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 	<ItemGroup>
-		<Protobuf Include="..\Autobarn.PricingServer\Protos\greet.proto" GrpcServices="Client" />
+		<Protobuf Include="..\Autobarn.PricingServer\Protos\price.proto" GrpcServices="Client" />
 	</ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
