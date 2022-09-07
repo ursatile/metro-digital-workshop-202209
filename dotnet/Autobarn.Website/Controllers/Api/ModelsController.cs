@@ -14,6 +14,7 @@ using Microsoft.Data.SqlClient.Server;
 namespace Autobarn.Website.Controllers.Api {
     [Route("api/[controller]")]
     [ApiController]
+    [Consumes("application/json")]
     public class ModelsController : ControllerBase {
         private readonly IAutobarnDatabase db;
         private readonly IBus bus;

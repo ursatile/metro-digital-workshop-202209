@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Autobarn.Website.Controllers.Api {
     [Route("api/[controller]")]
     [ApiController]
+    [Consumes("application/json")]
     public class VehiclesController : ControllerBase {
         private readonly IAutobarnDatabase db;
 
@@ -24,6 +25,7 @@ namespace Autobarn.Website.Controllers.Api {
         /// <returns>an IEnumerable&lt;Vehicle&gt;. If no vehicles exist, the enumerable will contain no elements. </returns>
         /// <response code="200">Returns a collection of vehicles</response>
         [HttpGet]
+        
         public IActionResult Get(int index = 0) {
             var vehicles = db.ListVehicles().Skip(index).Take(PAGE_SIZE);
             var total = db.CountVehicles();
