@@ -23,12 +23,12 @@ namespace Autobarn.PricingClient
             this.grpc = grpc;
         }
         public async Task StartAsync(CancellationToken cancellationToken) {
-            logger.LogCritical("THIS IS A CRITICAL PROBLEM");
-            logger.LogError("This went wrong but somebody probably tried again and it worked!");
-            logger.LogWarning("Something went wrong but nobody noticed");
-            logger.LogInformation("Started the pricing client!");
-            logger.LogDebug("This is really detailed debugging information");
-            logger.LogTrace("This is even more detailed debugging information");
+            //logger.LogCritical("THIS IS A CRITICAL PROBLEM");
+            //logger.LogError("This went wrong but somebody probably tried again and it worked!");
+            //logger.LogWarning("Something went wrong but nobody noticed");
+            //logger.LogInformation("Started the pricing client!");
+            //logger.LogDebug("This is really detailed debugging information");
+            //logger.LogTrace("This is even more detailed debugging information");
             await bus.PubSub.SubscribeAsync<NewVehicleMessage>("autobarn.pricingclient", HandleNewVehicleMessage);
         }
 
