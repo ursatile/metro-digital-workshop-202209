@@ -1,13 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Sinks.Graylog;
 
 namespace Autobarn.PricingServer {
     public class Program {
@@ -20,6 +19,7 @@ namespace Autobarn.PricingServer {
                     logging.ClearProviders();
                     logging.AddConsole();
                 })
+                .UseSerilog(ConfigureLogger)
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.ConfigureKestrel(options => {
                         var pfxPassword = Environment.GetEnvironmentVariable("UrsatilePfxPassword");
@@ -34,6 +34,17 @@ namespace Autobarn.PricingServer {
         private static Action<ListenOptions> UseCertIfAvailable(string pfxFilePath, string pfxPassword) {
             if (File.Exists(pfxFilePath)) return listen => listen.UseHttps(pfxFilePath, pfxPassword);
             return listen => listen.UseHttps();
+        }
+
+        static void ConfigureLogger(HostBuilderContext host, LoggerConfiguration log) {
+            log.MinimumLevel.Debug();
+            log.WriteTo.Console();
+            log.WriteTo.Graylog(
+                new GraylogSinkOptions {
+                    HostnameOrAddress = "workshop.ursatile.com",
+                    Port = 12201
+                });
+            log.Enrich.WithProcessName();
         }
     }
 }

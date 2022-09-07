@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net;
+using Serilog;
+using Serilog.Sinks.Graylog;
 
 namespace Autobarn.Website {
     public class Program {
@@ -19,6 +21,7 @@ namespace Autobarn.Website {
                     logging.ClearProviders();
                     logging.AddConsole();
                 })
+                .UseSerilog(ConfigureLogger)
                 .ConfigureWebHostDefaults(webBuilder => {
                     webBuilder.ConfigureKestrel(options => {
                         var pfxPassword = Environment.GetEnvironmentVariable("UrsatilePfxPassword");
@@ -34,6 +37,17 @@ namespace Autobarn.Website {
         private static Action<ListenOptions> UseCertIfAvailable(string pfxFilePath, string pfxPassword) {
             if (File.Exists(pfxFilePath)) return listen => listen.UseHttps(pfxFilePath, pfxPassword);
             return listen => listen.UseHttps();
+        }
+
+        static void ConfigureLogger(HostBuilderContext host, LoggerConfiguration log) {
+            log.MinimumLevel.Debug();
+            log.WriteTo.Console();
+            log.WriteTo.Graylog(
+                new GraylogSinkOptions {
+                    HostnameOrAddress = "workshop.ursatile.com",
+                    Port = 12201
+                });
+            log.Enrich.WithProcessName();
         }
     }
 }

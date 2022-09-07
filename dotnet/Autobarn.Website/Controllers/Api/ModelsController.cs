@@ -5,9 +5,11 @@ using Autobarn.Data;
 using Autobarn.Data.Entities;
 using Autobarn.Messages;
 using Autobarn.Website.Models;
+using Castle.Core.Logging;
 using EasyNetQ;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.Server;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,10 +20,12 @@ namespace Autobarn.Website.Controllers.Api {
     public class ModelsController : ControllerBase {
         private readonly IAutobarnDatabase db;
         private readonly IBus bus;
+        private readonly ILogger<ModelsController> logger;
 
-        public ModelsController(IAutobarnDatabase db, IBus bus) {
+        public ModelsController(IAutobarnDatabase db, IBus bus, ILogger<ModelsController> logger) {
             this.db = db;
             this.bus = bus;
+            this.logger = logger;
         }
         // GET: api/<ModelsController>
         //[HttpGet]
@@ -39,12 +43,17 @@ namespace Autobarn.Website.Controllers.Api {
         [HttpPost("{id}")]
         public async Task<IActionResult> Post(string id, [FromBody] VehicleDto dto) {
             var existing = db.FindVehicle(dto.Registration);
-            if (existing != null)
+            if (existing != null) {
+                logger.LogWarning($"Conflict: got a duplicate car request for {dto.Registration}", dto);
                 return Conflict(
                     $"Sorry, you can't sell the same car twice! (and {dto.Registration} is already in our database.)");
+            }
 
             var model = db.FindModel(id);
-            if (model == default) return BadRequest($"Sorry - we don't know what kind of car a {id} is!");
+            if (model == default) {
+                logger.LogWarning($"Invalid model code: {id}", dto);
+                return BadRequest($"Sorry - we don't know what kind of car a {id} is!");
+            }
 
             var vehicle = new Vehicle() {
                 VehicleModel = model,
@@ -67,6 +76,7 @@ namespace Autobarn.Website.Controllers.Api {
                 Registration = vehicle.Registration,
                 Year = vehicle.Year
             };
+            logger.LogDebug("Publishing NewVehicleMessage", newVehicleMessage);
             await bus.PubSub.PublishAsync(newVehicleMessage);
         }
     }
